@@ -185,7 +185,7 @@
 				TargetAttributes = {
 					DD85AD091B9088A600360BD2 = {
 						CreatedOnToolsVersion = 6.4;
-						DevelopmentTeam = F2Q5YFHJHH;
+						DevelopmentTeam = K8JPK93EKW;
 						SystemCapabilities = {
 							com.apple.HomeKit = {
 								enabled = 1;
