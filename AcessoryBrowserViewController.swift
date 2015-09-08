@@ -16,6 +16,8 @@ class AcessoryBrowserViewController: UIViewController, HMHomeManagerDelegate, HM
     var home: HMHome!
     var room: HMRoom!
     
+    @IBOutlet weak var nameNav: UINavigationItem!
+    
     lazy var acessoryBrowser: HMAccessoryBrowser = {
         let browser = HMAccessoryBrowser()
         browser.delegate = self
@@ -53,10 +55,53 @@ class AcessoryBrowserViewController: UIViewController, HMHomeManagerDelegate, HM
             }
         })
     }
+    
+    func accessoryBrowser(browser: HMAccessoryBrowser, didFindNewAccessory accessory: HMAccessory!){
+        print("encontrou accessorio")
+        println("adicionando ele na casa")
+        home.addAccessory(accessory, completionHandler: { (error: NSError!) -> Void in
+            if error != nil{
+                println(" falhou ")
+                println("error = \(error)")
+            } else{
+                println("adicionou o acessorio a casa")
+                self.home.assignAccessory(accessory, toRoom: self.room, completionHandler: { (error:NSError!) -> Void in
+                    if error != nil {
+                        println("nao adiocionou acessorio no quarto")
+                        println("erro = \(error)")
+                    } else {
+                        println(" uuuuha ")
+                        self.findServicesForAccessory(accessory)
+                    }
+                })
+            }
+        })
+    }
+    
+    func findServicesForAccessory(acessorio: HMAccessory){
+        println("procurando servicos desse acessorio")
+        for service in acessorio.services as! [HMService]{
+            println(" Service name = \(service.name)")
+            println(" Service type = \(service.serviceType)")
+            
+            println("procurando caracteristicas do serviço")
+            self.findCharacteristicsOfService(service)
+        }
+    }
+    
+    func findCharacteristicsOfService(servico: HMService){
+        for characteristic in servico.characteristics as! [HMCharacteristic]{
+            println("tipo de caracteristica = "+" \(characteristic.characteristicType)")
+        }
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func accessoryBrowser(browser: HMAccessoryBrowser, didRemoveNewAccessory accessory: HMAccessory!) {
+        println("accessorio removido")
     }
     // uha
 
