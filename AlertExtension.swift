@@ -33,7 +33,7 @@ extension UIAlertController{
         let controller = UIAlertController(title: title, message: message, preferredStyle: .Alert)
         
         controller.addAction(UIAlertAction(title:"OK", style: .Default){ (alert) -> Void in
-            if count(SomeTextField!.text) == 0{
+            if SomeTextField!.text.characters.count == 0{
               self.showAlertControllOnHostController(hostViewController, title: "home name", message: "coloca o nome ai mano")
                 return
             }

@@ -36,9 +36,9 @@ class RoomViewController: UIViewController, HMHomeDelegate, UITableViewDataSourc
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell{
         
-        var cell = self.tableView.dequeueReusableCellWithIdentifier("CellRoom", forIndexPath: indexPath) as! UITableViewCell
+        let cell = self.tableView.dequeueReusableCellWithIdentifier("CellRoom", forIndexPath: indexPath) 
         
-        let room = home.rooms[indexPath.row] as! HMRoom
+        let room = home.rooms[indexPath.row] 
         cell.textLabel!.text = room.name
         
         return cell
@@ -47,8 +47,8 @@ class RoomViewController: UIViewController, HMHomeDelegate, UITableViewDataSourc
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         switch editingStyle{
         case .Delete:
-            let room = home.rooms[indexPath.row] as! HMRoom
-            home.removeRoom(room, completionHandler: { (error: NSError!) -> Void in
+            let room = home.rooms[indexPath.row] 
+            home.removeRoom(room, completionHandler: { (error: NSError?) -> Void in
                 if error != nil{
                     UIAlertController.showAlertControllOnHostController(self, title: "error", message: "deu ruim mano= \(error)")
                 } else {
@@ -60,17 +60,17 @@ class RoomViewController: UIViewController, HMHomeDelegate, UITableViewDataSourc
         }
     }
     
-    func home(home: HMHome, didAddRoom room: HMRoom!) {
+    func home(home: HMHome, didAddRoom room: HMRoom) {
         
     }
     
-    func home(home: HMHome, didRemoveRoom room: HMRoom!) {
+    func home(home: HMHome, didRemoveRoom room: HMRoom) {
         
     }
 
     @IBAction func addRoomToHome(sender: AnyObject) {
         UIAlertController.addAlert(self, title: "Room Name", message: "Coloca o quarto ai mano") { (texto) -> Void in
-            self.home.addRoomWithName(texto, completionHandler: { (room: HMRoom!, error: NSError!) -> Void in
+            self.home.addRoomWithName(texto, completionHandler: { (room: HMRoom?, error: NSError?) -> Void in
                 if error != nil{
                     UIAlertController.showAlertControllOnHostController(self, title: "Error", message: "\(error)")
                 }
@@ -78,6 +78,33 @@ class RoomViewController: UIViewController, HMHomeDelegate, UITableViewDataSourc
 
             })
         }
+    }
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "roomIdentifier"{
+
+        let controller = segue.destinationViewController
+            as! AccessoryViewController
+        controller.homeManager = homeManager
+            controller.home = home
+            let room = home.rooms[tableView.indexPathForSelectedRow!.row] 
+            controller.room = room
+        }
+        
+//
+//        if segue.identifier == "roomIdentifier"{
+//            
+//            let controller = segue.destinationViewController
+//                as! AccessoryViewController
+//            controller.homeManager = homeManager
+//            
+//            let home = homeManager.homes[tableView.indexPathForSelectedRow()!.row]
+//                as! HMHome
+//            
+//            controller.home = home
+//        }
+        
+        super.prepareForSegue(segue, sender: sender)
+        
     }
 
     

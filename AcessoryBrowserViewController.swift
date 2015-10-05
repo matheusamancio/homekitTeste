@@ -9,14 +9,14 @@
 import UIKit
 import HomeKit
 
-class AcessoryBrowserViewController: UIViewController, HMHomeManagerDelegate, HMAccessoryBrowserDelegate {
+class AcessoryBrowserViewController: UIViewController, HMHomeManagerDelegate,UITableViewDelegate,UITableViewDataSource,HMAccessoryBrowserDelegate {
     
     var homeManager: HMHomeManager!
     var acessories = [HMAccessory]()
     var home: HMHome!
     var room: HMRoom!
     
-    @IBOutlet weak var nameNav: UINavigationItem!
+    @IBOutlet weak var tableview: UITableView!
     
     lazy var acessoryBrowser: HMAccessoryBrowser = {
         let browser = HMAccessoryBrowser()
@@ -24,7 +24,7 @@ class AcessoryBrowserViewController: UIViewController, HMHomeManagerDelegate, HM
         return browser
     }()
     
-    var homeName = "Minha Casa"
+    var homeName = "Minha Casa 11"
     
     let roomName = "bedroom 1"
     
@@ -37,40 +37,49 @@ class AcessoryBrowserViewController: UIViewController, HMHomeManagerDelegate, HM
     }
     
     func homeManagerDidUpdateHomes(manager: HMHomeManager) {
-        manager.addHomeWithName(homeName, completionHandler: { (home: HMHome!, error: NSError!) -> Void in
+        manager.addHomeWithName(homeName, completionHandler: { (home: HMHome?, error: NSError?) -> Void in
             if error != nil {
                 print("nao adicionou a casa")
-            } else{
-//                let strongSelf = self!
-//                strongSelf.home = home
-                println("adicionou")
-                println("adicionando quarto pra casa...")
-                home.addRoomWithName(self.roomName, completionHandler: { (room: HMRoom!, error: NSError!) -> Void in
+            } else {
+                let strongSelf = self
+                strongSelf.home = home
+                print("Successfully added a home")
+                print("Adding a room to the home...")
+                home.addRoomWithName(strongSelf.roomName, completionHandler: {
+                    (room: HMRoom?, error: NSError?) in
+                    
                     if error != nil{
-                        print("failed to add a room")
-                    } else{
-                        self.acessoryBrowser.startSearchingForNewAccessories()
+                        print("Failed to add a room...")
+                    } else {
+                        strongSelf.room = room
+                        print("Successfully added a room.")
+                        print("Discovering accessories now...")
+                        strongSelf.acessoryBrowser.startSearchingForNewAccessories()
                     }
                 })
             }
         })
     }
     
-    func accessoryBrowser(browser: HMAccessoryBrowser, didFindNewAccessory accessory: HMAccessory!){
-        print("encontrou accessorio")
-        println("adicionando ele na casa")
-        home.addAccessory(accessory, completionHandler: { (error: NSError!) -> Void in
+    func accessoryBrowser(browser: HMAccessoryBrowser, didFindNewAccessory accessory: HMAccessory){
+        print("encontrou accessorio", terminator: "")
+        print("adicionando ele na casa")
+        print("qual o nome dele: ")
+        print("\(accessory)")
+
+
+        home.addAccessory(accessory, completionHandler: { (error: NSError?) -> Void in
             if error != nil{
-                println(" falhou ")
-                println("error = \(error)")
+                print(" falhou ")
+                print("error = \(error)")
             } else{
-                println("adicionou o acessorio a casa")
-                self.home.assignAccessory(accessory, toRoom: self.room, completionHandler: { (error:NSError!) -> Void in
+                print("adicionou o acessorio a casa")
+                self.home.assignAccessory(accessory, toRoom: self.room, completionHandler: { (error:NSError?) -> Void in
                     if error != nil {
-                        println("nao adiocionou acessorio no quarto")
-                        println("erro = \(error)")
+                        print("nao adiocionou acessorio no quarto")
+                        print("erro = \(error)")
                     } else {
-                        println(" uuuuha ")
+                        print(" uuuuha ")
                         self.findServicesForAccessory(accessory)
                     }
                 })
@@ -79,19 +88,19 @@ class AcessoryBrowserViewController: UIViewController, HMHomeManagerDelegate, HM
     }
     
     func findServicesForAccessory(acessorio: HMAccessory){
-        println("procurando servicos desse acessorio")
-        for service in acessorio.services as! [HMService]{
-            println(" Service name = \(service.name)")
-            println(" Service type = \(service.serviceType)")
+        print("procurando servicos desse acessorio")
+        for service in acessorio.services {
+            print(" Service name = \(service.name)")
+            print(" Service type = \(service.serviceType)")
             
-            println("procurando caracteristicas do serviço")
+            print("procurando caracteristicas do serviço")
             self.findCharacteristicsOfService(service)
         }
     }
     
-    func findCharacteristicsOfService(servico: HMService){
-        for characteristic in servico.characteristics as! [HMCharacteristic]{
-            println("tipo de caracteristica = "+" \(characteristic.characteristicType)")
+    func findCharacteristicsOfService(service: HMService){
+        for characteristic in service.characteristics {
+            print("tipo de caracteristica = "+" \(characteristic.characteristicType)")
         }
     }
 
@@ -100,9 +109,21 @@ class AcessoryBrowserViewController: UIViewController, HMHomeManagerDelegate, HM
         // Dispose of any resources that can be recreated.
     }
     
-    func accessoryBrowser(browser: HMAccessoryBrowser, didRemoveNewAccessory accessory: HMAccessory!) {
-        println("accessorio removido")
+    func accessoryBrowser(browser: HMAccessoryBrowser, didRemoveNewAccessory accessory: HMAccessory) {
+        print("accessorio removido")
     }
+    
+     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return acessories.count
+    }
+    
+     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = self.tableview.dequeueReusableCellWithIdentifier("cellz") as! UITableViewCell
+        let accessory = acessories[indexPath.row] as HMAccessory
+        cell.textLabel?.text = accessory.name
+        return cell
+    }
+
     // uha
 
     /*

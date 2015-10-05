@@ -25,6 +25,7 @@ class HomeViewController: UIViewController, HMHomeManagerDelegate, UITableViewDe
         }()
 
     
+
    
     
     @IBOutlet weak var tableView: UITableView!
@@ -57,8 +58,8 @@ class HomeViewController: UIViewController, HMHomeManagerDelegate, UITableViewDe
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell{
         
-        var cell = self.tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
-        let home = homeManager.homes[indexPath.row] as! HMHome
+        let cell = self.tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
+        let home = homeManager.homes[indexPath.row] 
         cell.textLabel?.text = home.name
         
         
@@ -90,9 +91,10 @@ class HomeViewController: UIViewController, HMHomeManagerDelegate, UITableViewDe
         
         switch editingStyle {
         case .Delete:
-            let home = homeManager.homes[indexPath.row] as! HMHome
-            homeManager.removeHome(home, completionHandler: { [weak self] (error: NSError!) in
-                let strongself = self!
+            let home = homeManager.homes[indexPath.row]
+            homeManager.removeHome(home, completionHandler: { (error: NSError?) -> Void in
+
+                let strongself = self
                 
                 if error != nil{
                     UIAlertController.showAlertControllOnHostController(strongself, title: "Error", message: "An error occurred = \(error)")
@@ -135,7 +137,7 @@ class HomeViewController: UIViewController, HMHomeManagerDelegate, UITableViewDe
     
     @IBAction func addHome(sender: AnyObject) {
         UIAlertController.addAlert(self, title: "Nova Casa", message: "coloca uma casa") { (texto) -> Void in
-            self.homeManager.addHomeWithName(texto, completionHandler: {[weak self] (home: HMHome!, error: NSError!) -> Void in
+            self.homeManager.addHomeWithName(texto, completionHandler: {[weak self] (home: HMHome?, error: NSError?) -> Void in
                 
                 if error != nil {
                     UIAlertController.showAlertControllOnHostController(self!, title: "ERRO", message: "\(error)")
@@ -158,8 +160,8 @@ class HomeViewController: UIViewController, HMHomeManagerDelegate, UITableViewDe
                 as! RoomViewController
             controller.homeManager = homeManager
             
-            let home = homeManager.homes[tableView.indexPathForSelectedRow()!.row]
-                as! HMHome
+            let home = homeManager.homes[tableView.indexPathForSelectedRow!.row]
+                
             
             controller.home = home
         }
